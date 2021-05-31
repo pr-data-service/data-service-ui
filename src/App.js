@@ -1,25 +1,38 @@
-import logo from './logo.svg';
-import './App.css';
+import { ThemeProvider, makeStyles } from '@material-ui/core/styles';
+import themeInstance from './styles/theme';
+
+import LoginContainer from './containers/LoginContainer';
 
 function App() {
+  return <ThemeProvider theme={themeInstance}>
+    <LoginContainer />
+  </ThemeProvider>;
+}
+export default App;
+
+
+
+
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    background: theme.background,
+    border: 0,
+    fontSize: 16,
+    borderRadius: 3,
+    boxShadow: '0 3px 5px 2px rgba(255, 105, 135, .3)',
+    color: 'white',
+    height: 48,
+    padding: '0 30px',
+  },
+}));
+
+function DeepChild() {
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Test Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <button type="button" className={classes.root}>
+      Theming
+    </button>
   );
 }
-
-export default App;
