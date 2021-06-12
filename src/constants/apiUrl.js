@@ -1,11 +1,7 @@
 
 const apiUrl = {
     //HOST: "http://192.168.0.102:8080",
-<<<<<<< HEAD
-    HOST: "http://13.232.187.25:8055",
-=======
     HOST: "//13.232.187.25:8055",
->>>>>>> c1a84b90e090d902a870873877b56eb0f77dd545
 
     LOGIN: "/authentication/authenticate",
     LOGGEDIN_USER_GET: "/authentication/loggedInUser/get",
