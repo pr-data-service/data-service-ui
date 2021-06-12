@@ -39,6 +39,8 @@ const initDataFilter = {
 const RawDataDraftingListviewContainer = () => {
     const { showSnackbar, openConfirmDialog } = React.useContext(AppRootContext);
     const { loggedInUser } = React.useContext(AppContext);
+    const isAdmin = loggedInUser && loggedInUser.admin ? true : false;
+
     const classes = useStyles();
     const history = useHistory();
     const [rows, setRows] = React.useState([]);
@@ -49,10 +51,9 @@ const RawDataDraftingListviewContainer = () => {
         getData(filterParams);
         getAllActiveUser();
     }, []);
-
-
+    
     const getAllActiveUser = async () => {
-        if(loggedInUser && loggedInUser.admin) { 
+        if(loggedInUser && (loggedInUser.admin || loggedInUser.superAdmin)) {
             let responseData = await userService.getAllActiveUser();
             if(responseData && responseData.status == 0 && responseData.data){
                 let users = responseData.data;
@@ -100,9 +101,13 @@ const RawDataDraftingListviewContainer = () => {
 
         openConfirmDialog("Do you want to delete this record?", null, async () => {
             let responseData = await dtataDraftingFormService.deleteRawDataById(id);
-            if(responseData && responseData.status == 0){
-                showSnackbar("Successfully deleted.");
-                getData(filterParams);
+            if(responseData){
+                if(responseData.status == 0) {
+                    showSnackbar("Successfully deleted.");
+                    getData(filterParams);
+                } else {
+                    showSnackbar(responseData.message);
+                }
             } else {
                 showSnackbar("Failed to deleted.");
             }
@@ -151,13 +156,13 @@ const columns = [
     { field: 'purchaseValReduc', headerName: 'PURCHASE VALUE REDUC.(%)', type: "FLOAT", width: 200, },
     { field: 'monthPrincReduc', headerName: 'MONTHLY PRIN. REDUC.(%)', type: "FLOAT", width: 200, },
     { field: 'totIntReduc', headerName: 'TOTAL INTEREST REDUC.(%)', type: "FLOAT", width: 200, },
-    { field: 'propTaxState', headerName: 'PROP. TAX STATE', type: "STRING", width: 200, },
-    { field: 'propTaxCity', headerName: 'PROP. TAX CITY', type: "STRING", width: 200, },
+    // { field: 'propTaxState', headerName: 'PROP. TAX STATE', type: "STRING", width: 200, },
+    // { field: 'propTaxCity', headerName: 'PROP. TAX CITY', type: "STRING", width: 200, },
     { field: 'propTaxReducPrcntg', headerName: 'PROP. TAX REDUC.(%)', type: "", width: 200, },
-    { field: 'createdBy', headerName: 'Created By', type: "STRING", width: 150, },
-    { field: 'updatedBy', headerName: 'Updated By', type: "STRING", width: 150, },
-    { field: 'createdOn', headerName: 'Created On', type: "DATE", width: 200, },
-    { field: 'updatedOn', headerName: 'Updated On', type: "DATE", width: 200, },
+    { field: 'createdBy', headerName: 'CREATED BY', type: "STRING", width: 150, },
+    { field: 'updatedBy', headerName: 'UPDATED BY', type: "STRING", width: 150, },
+    { field: 'createdOn', headerName: 'CREATED ON', type: "DATE", width: 200, },
+    { field: 'updatedOn', headerName: 'UPDATED ON', type: "DATE", width: 200, },
 ];
 
 

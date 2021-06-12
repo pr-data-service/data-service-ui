@@ -47,17 +47,29 @@ const SignupUserContainer = () => {
 
     
     React.useEffect(()=>{
+        filterFieldsForUser();
         if(id>0) {
             getDataToEdit(id);
-            filterFieldsForUser();
         }
     },[id]);
 
     const filterFieldsForUser = async () => {
-        if(loggedInUser && loggedInUser.admin) {
-            //bypass...
+        
+                
+        if(loggedInUser) {
+            let isProfile = history.location.pathname.startsWith("/profile/edit/");
+            if(loggedInUser.superAdmin) {
+                if(isProfile){
+                    let arr = fieldsArr.filter( f => f.name != "isActive" && f.name != "type" );
+                    setFields(arr);
+                }
+                
+            } else {
+                let arr = fieldsArr.filter( f => f.name != "isActive" && f.name != "phone" && f.name != "type");
+                setFields(arr);
+            }           
         } else {
-            let arr = fieldsArr.filter( f => f.name != "isActive" && f.name != "phone" );
+            let arr = fieldsArr.filter( f => f.name != "isActive" && f.name != "type");
             setFields(arr);
         }    
     }
@@ -70,6 +82,11 @@ const SignupUserContainer = () => {
     }
 
     const onSubmit = async (data, e) => {
+        let isProfile = history.location.pathname.startsWith("/profile/edit/");
+        if(!isProfile && loggedInUser.userName == data.userName) {
+            showSnackbar("Logged in user record can not update from here. Go to profile and update.");
+            return;
+        }
         if(id > 0) {
             data.id = id;
         }
@@ -129,7 +146,17 @@ const SignupUserContainer = () => {
 
 export default SignupUserContainer;
 
+const userOptions = [
+    {value: " ", label: '-- Select --'}, 
+    {value: "USER", label: 'User'}, 
+    {value: "ADMIN", label: 'Admin'}
+];
 
+const activeDeactiveOptions = [
+    {value: " ", label: '-- Select --'}, 
+    {value: true, label: 'Active'}, 
+    {value: false, label: 'De-Active'}
+];
 
 const fieldsArr = [
     {name: "userName", label:"User name", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}},
@@ -138,7 +165,8 @@ const fieldsArr = [
     {name: "lastName", label:"Last Name", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}},
     {name: "email", label:"Email", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}},
     {name: "phone", label:"Phone", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}},
-    {name: "isActive", label:"Active/De-Active", type: "SELECT", gridXS: 12, required: true, value: "", rules: {}, options: [{value: true, label: 'Active'}, {value: false, label: 'De-Active'}]},
+    {name: "type", label:"User Role", type: "SELECT", gridXS: 12, required: true, value: "", rules: {}, options: userOptions},
+    {name: "isActive", label:"Active/De-Active", type: "SELECT", gridXS: 12, required: true, value: "", rules: {}, options: activeDeactiveOptions},
 ]
 
 //onSubmit={onSubmit} callBack={callBack} formValues={formValues}

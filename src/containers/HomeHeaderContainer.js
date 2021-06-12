@@ -130,7 +130,8 @@ const HomeHeaderContainer = () => {
     }
 
     const isAdmin = loggedInUser && loggedInUser.admin ? true : false;
-    const logedInUserName = loggedInUser ? loggedInUser.firstName + " " + loggedInUser.lastName : "";
+    const isSuperAdmin = loggedInUser && loggedInUser.superAdmin ? true : false;
+    const logedInUserName = loggedInUser ? loggedInUser.firstName + " " + loggedInUser.lastName : "";    
 
     return <AppBar position="static" className={classes.root}>
         <Toolbar>
@@ -151,7 +152,7 @@ const HomeHeaderContainer = () => {
                 />
             </Box> */}
             <Box className={classes.grow} />
-            <Box className={classes.user} variant="h6">{logedInUserName}</Box>
+            <Box className={classes.user} variant="h6">{logedInUserName} [{loggedInUser.type}]</Box>
             <Box className={classes.sectionDesktop}>
                 {/* <IconButton aria-label="show 4 new mails" color="inherit">
                     <Badge badgeContent={4} color="secondary">
@@ -187,7 +188,7 @@ const HomeHeaderContainer = () => {
             onClose={handleMenuClose}            
         >
             <MenuItem onClick={() => {handleMenuClose(); handleEditProfile()} }>Profile</MenuItem>
-            {isAdmin && <MenuItem onClick={handleMenuClose} onClick={handleLoginTime}>Login Time</MenuItem>}
+            {isSuperAdmin && <MenuItem onClick={handleMenuClose} onClick={handleLoginTime}>Login Time</MenuItem>}
             <MenuItem onClick={handleMenuClose} onClick={handleLogout}>Logout</MenuItem>
         </Menu>
     </AppBar>;

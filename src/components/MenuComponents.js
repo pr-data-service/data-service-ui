@@ -18,11 +18,15 @@ const MenuComponent = () => {
     const classes = useStyles();
     const { loggedInUser } = React.useContext(AppContext);
     const isAdmin = loggedInUser && loggedInUser.admin ? true : false;
+    const isSuperAdmin = loggedInUser && loggedInUser.superAdmin ? true : false;
+    
     return <Paper elevation={8} className={classes.menuContainer}>
-        {isAdmin && <Typography><Link href="/user-listview">User List</Link></Typography>}
         <Typography><Link href="/data-drafting-form">Drafting Form</Link></Typography>
         <Typography><Link href="/data-drafting-listview">Drafting List View</Link></Typography>
-        <Typography><Link href="/data-drafting-result-listview">Drafting Result List View</Link></Typography>
+        {isSuperAdmin && <React.Fragment>
+            <Typography><Link href="/data-drafting-result-listview">Drafting Result List View</Link></Typography>
+            <Typography><Link href="/user-listview">User List</Link></Typography>            
+        </React.Fragment>}
     </Paper>
 }
 

@@ -16,6 +16,7 @@ const HomeRouterComponent = () => {
     const history = useHistory();
     const { loggedInUser } = React.useContext(AppContext);
     const isAdmin = loggedInUser && loggedInUser.admin ? true : false;
+    const isSuperAdmin = loggedInUser && loggedInUser.superAdmin ? true : false;
 
     React.useEffect(() => {
         if(history.location.pathname == "/") {
@@ -29,12 +30,13 @@ const HomeRouterComponent = () => {
             <Route exact path="/data-drafting-form/:id"  component={DataDraftingFormComponent}/>
             <Route exact path="/data-drafting-listview"  component={RawDataDraftingListviewContainer}/>
             <Route exact path="/profile/edit/:id" component={SignupUserContainer}/>
-            {isAdmin && <React.Fragment>
+            {isSuperAdmin && <React.Fragment>
                 <Route exact path="/user-listview"  component={UsersListViewContainer}/>
                 <Route exact path="/user/edit/:id" component={SignupUserContainer}/>
-                <Route exact path="/login-time" component={LogInTimeComponent}/>                
+                <Route exact path="/login-time" component={LogInTimeComponent}/>  
+                <Route exact path="/data-drafting-result-listview"  component={DataDraftingResultListViewContainer}/>              
             </React.Fragment>}
-            <Route exact path="/data-drafting-result-listview"  component={DataDraftingResultListViewContainer}/>
+            
     </React.Fragment>
 }
 

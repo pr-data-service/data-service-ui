@@ -44,16 +44,15 @@ const DataDraftingResultListViewContainer = () => {
     const [rows, setRows] = React.useState([]);
     const [filterParams, setFilterParams] = React.useState({ ...initDataFilter });
     const [filterFields, setFilterFields] = React.useState([...arrFields]);
-    const isExcelDownlod = loggedInUser && loggedInUser.admin ? true : false;
+    const isExcelDownlod = loggedInUser && loggedInUser.superAdmin ? true : false;
     
     React.useEffect(() => {
         getData(filterParams);
         getAllActiveUser();
     }, []);
-
-
+    
     const getAllActiveUser = async () => {
-        if (loggedInUser && loggedInUser.admin) {
+        if (loggedInUser && (loggedInUser.superAdmin || loggedInUser.admin)) {
             let responseData = await userService.getAllActiveUser();
             if (responseData && responseData.status == 0 && responseData.data) {
                 let users = responseData.data;
@@ -166,10 +165,10 @@ const columns = [
     { field: 'loanAmountAndPrincipal', headerName: 'LOAN AMOUNT AND PRINCIPAL', type: "STRING", width: 200, },
     { field: 'intForTotLoanPeriodAndPropTaxForLoanPeriod', headerName: 'INTEREST FOR TOTAL LOAN PERIOD AND PROPERTY TAX FOR LOAN PERIOD', type: "STRING", width: 200, },
     { field: 'propInsurPerMonthAndPmiPerAnnum', headerName: 'PROPERTY INSURANCE PER MONTH AND PMI PER ANNUM', type: "STRING", width: 200, },
-    { field: 'createdBy', headerName: 'Created By', type: "STRING", width: 150, },
-    { field: 'updatedBy', headerName: 'Updated By', type: "STRING", width: 150, },
-    { field: 'createdOn', headerName: 'Created On', type: "DATE", width: 200, },
-    { field: 'updatedOn', headerName: 'Updated On', type: "DATE", width: 200, },
+    { field: 'createdBy', headerName: 'CREATED BY', type: "STRING", width: 150, },
+    { field: 'updatedBy', headerName: 'UPDATED BY', type: "STRING", width: 150, },
+    { field: 'createdOn', headerName: 'CREATED ON', type: "DATE", width: 200, },
+    { field: 'updatedOn', headerName: 'UPDATED ON', type: "DATE", width: 200, },
 ];
 
 
