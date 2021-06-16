@@ -83,7 +83,7 @@ const SignupUserContainer = () => {
 
     const onSubmit = async (data, e) => {
         let isProfile = history.location.pathname.startsWith("/profile/edit/");
-        if(!isProfile && loggedInUser.userName == data.userName) {
+        if(!isProfile && loggedInUser && loggedInUser.userName == data.userName) {
             showSnackbar("Logged in user record can not update from here. Go to profile and update.");
             return;
         }
@@ -158,8 +158,17 @@ const activeDeactiveOptions = [
     {value: false, label: 'De-Active'}
 ];
 
+const onBlurEvent = (getValues, setValue, fieldName, event) => {
+
+    if (fieldName == "userName") {
+        let val = event.target.value;
+        val = val.replaceAll(" ", "");
+        setValue(fieldName, val);
+    }
+}
+
 const fieldsArr = [
-    {name: "userName", label:"User name", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}},
+    {name: "userName", label:"User name", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}, event: { onBlur: onBlurEvent }},
     {name: "password", label:"Password", type: "PASSWORD", gridXS: 12, required: true, value: "", rules: {}},
     {name: "firstName", label:"First Name", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}},
     {name: "lastName", label:"Last Name", type: "TEXT", gridXS: 12, required: true, value: "", rules: {}},
@@ -168,5 +177,3 @@ const fieldsArr = [
     {name: "type", label:"User Role", type: "SELECT", gridXS: 12, required: true, value: "", rules: {}, options: userOptions},
     {name: "isActive", label:"Active/De-Active", type: "SELECT", gridXS: 12, required: true, value: "", rules: {}, options: activeDeactiveOptions},
 ]
-
-//onSubmit={onSubmit} callBack={callBack} formValues={formValues}

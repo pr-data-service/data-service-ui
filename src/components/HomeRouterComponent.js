@@ -11,6 +11,8 @@ import UsersListViewContainer from "../containers/UsersListViewContainer";
 import AppContext from "./AppContext";
 import DataDraftingResultListViewContainer from "../containers/DataDraftingResultListViewContainer";
 import LogInTimeComponent from "./LogInTimeComponent";
+import { Box } from "@material-ui/core";
+import ChangePasswordComponent from "./ChangePasswordComponent";
 
 const HomeRouterComponent = () => {
     const history = useHistory();
@@ -20,24 +22,25 @@ const HomeRouterComponent = () => {
 
     React.useEffect(() => {
         if(history.location.pathname == "/") {
-            history.push("/data-drafting-listview")
+            history.push("/listview")
         }        
     }, [])
 
 
-    return <React.Fragment>
+    return <Box style={{height: "inherit"}}>
             <Route exact path="/data-drafting-form"  component={DataDraftingFormComponent}/>
             <Route exact path="/data-drafting-form/:id"  component={DataDraftingFormComponent}/>
-            <Route exact path="/data-drafting-listview"  component={RawDataDraftingListviewContainer}/>
+            <Route exact path="/listview"  component={RawDataDraftingListviewContainer}/>
             <Route exact path="/profile/edit/:id" component={SignupUserContainer}/>
-            {isSuperAdmin && <React.Fragment>
-                <Route exact path="/user-listview"  component={UsersListViewContainer}/>
+            <Route exact path="/change-password" component={ChangePasswordComponent}/>  
+            {isSuperAdmin && <React.Fragment>                
                 <Route exact path="/user/edit/:id" component={SignupUserContainer}/>
                 <Route exact path="/login-time" component={LogInTimeComponent}/>  
-                <Route exact path="/data-drafting-result-listview"  component={DataDraftingResultListViewContainer}/>              
+                <Route exact path="/result-listview"  component={DataDraftingResultListViewContainer}/>              
             </React.Fragment>}
+            {(isSuperAdmin || isAdmin) && <Route exact path="/user-listview" component={UsersListViewContainer}/>}
             
-    </React.Fragment>
+    </Box>
 }
 
 export default HomeRouterComponent;

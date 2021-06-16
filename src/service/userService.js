@@ -31,6 +31,14 @@ const getAllActiveUser = () => {
     }  
 }
 
+const getAllAdminUser = () => {
+    try{
+        return HttpClient.get(apiUrl.USER_LIST_ADMIN_GET);
+    }catch(error){
+        console.error(error);
+    }  
+}
+
 const getListViewData = (params) => {
     try{
         return HttpClient.get(apiUrl.USER_LIST_VIEW_GET, params);
@@ -47,11 +55,27 @@ const deleteUserById = (id) => {
     }  
 }
 
+const addToParent = (params) => {
+    return HttpClient.post(apiUrl.USER_ADD_TO_PARENT, params);
+}
+
+const removeFromParent = (params) => {
+    return HttpClient.post(apiUrl.USER_REMOVE_FROM_PARENT, params);
+}
+
+const activeOrDeactive = (params) => {
+    return HttpClient.post(apiUrl.USER_ACTIVE_OR_DEACTIVE, params);
+}
+
 export default {
     saveUser,
     getUserById,
     getLoggedInUser,
     getAllActiveUser,
+    getAllAdminUser,
     getListViewData,
-    deleteUserById
+    deleteUserById,
+    addToParent,
+    removeFromParent,
+    activeOrDeactive
 }

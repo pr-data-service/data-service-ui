@@ -9,8 +9,8 @@ const useStyles = makeStyles((theme) => ({
 
     },
     menuContainer: {
-        height: 610,
-        padding: 30
+        height: "calc(100% - 30px)",
+        padding: 15
     },
 }));
 
@@ -21,12 +21,10 @@ const MenuComponent = () => {
     const isSuperAdmin = loggedInUser && loggedInUser.superAdmin ? true : false;
     
     return <Paper elevation={8} className={classes.menuContainer}>
-        <Typography><Link href="/data-drafting-form">Drafting Form</Link></Typography>
-        <Typography><Link href="/data-drafting-listview">Drafting List View</Link></Typography>
-        {isSuperAdmin && <React.Fragment>
-            <Typography><Link href="/data-drafting-result-listview">Drafting Result List View</Link></Typography>
-            <Typography><Link href="/user-listview">User List</Link></Typography>            
-        </React.Fragment>}
+        <Typography><Link href="/data-drafting-form">Form</Link></Typography>
+        <Typography><Link href="/listview">List View</Link></Typography>
+        {isSuperAdmin && <Typography><Link href="/result-listview">Result View</Link></Typography>}
+        {(isSuperAdmin || isAdmin) && <Typography><Link href="/user-listview">User List View</Link></Typography>}
     </Paper>
 }
 

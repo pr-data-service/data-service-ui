@@ -21,11 +21,13 @@ import moment from 'moment'
 import ListViewFilterComponent from './ListViewFilterComponent';
 import TablePagination from '@material-ui/core/TablePagination';
 import Pagination from 'react-js-pagination';
-
+import IconButton from '@material-ui/core/IconButton';
+import MoreIcon from '@material-ui/icons/MoreVert';
+import AppRootContext from './AppRootContext';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        height: 580
+        height: 460
     },
     header: {
         padding: 10,
@@ -35,10 +37,10 @@ const useStyles = makeStyles((theme) => ({
         height: 29
     },
     dataGrid: {
-        //height: "80%"
+        height: "calc(100% - 50px)"
     },
     innerClass: {
-        listStyle: "none",        
+        listStyle: "none",
         display: "flex"
     },
     itemClass: {
@@ -55,39 +57,51 @@ const useStyles = makeStyles((theme) => ({
             color: "white",
             textDecoration: "none"
         }
+    },
+    moreButton: {
+        padding: 0,
+        cursor: "pointer"
     }
 }));
 
 const ListViewDataGrid = ({
-    columns=[], 
-    rows=[], 
-    callBack=() =>{}, 
-    filterFields=[], 
-    onFilterChange=() =>{}, 
-    checkboxSelection=true, isEdit=true, isDelete=true, isExcelDownlod=false}) => {
-        
+    id = "list",
+    columns = [],
+    rows = [],
+    callBack = () => { },
+    filterFields = [],
+    onFilterChange = () => { },
+    checkboxSelection = true, isEdit = true, isDelete = true, isExcelDownlod = false,
+    moreMenues=[]//{value, label}
+ }) => {
+    const { showSnackbar, openConfirmDialog, openDialog, openCustomMenu } = React.useContext(AppRootContext);
     const classes = useStyles();
     const apiRef = React.useRef();
     const [rowIds, setRowIds] = React.useState([]);
 
-    columns.map( m => {
-        m.renderHeader = (params) => <FormattedHeaderComponent {...params}/>
-        m.renderCell = (params) => <FormattedCellComponent params={params}/>
+    columns.map(m => {
+        m.renderHeader = (params) => <FormattedHeaderComponent {...params} />
+        m.renderCell = (params) => <FormattedCellComponent params={params} />
         //m.valueFormatter = (params) => () => {}//valueFormatter;
     })
 
-    const handleEvent = ({selectionModel}) => {
+    const handleEvent = ({ selectionModel }) => {
         console.log(apiRef)
         setRowIds(selectionModel);
     }
 
-    const handleRowSelect = ({api, data, isSelect}) => {
+    const handleRowSelect = ({ api, data, isSelect }) => {
         setRowIds([data.id]);
-    }  
-    
+    }
+
     const handleRecordEvent = (type) => () => {
         callBack(type, rowIds);
     }
+
+    const handleMoreButton = (value) => {
+        callBack("FROM_MORE_BUTTON", {value, selectedRecordIds: rowIds});
+    }
+    
 
     /*
     const [page, setPage] = React.useState(0);
@@ -111,25 +125,29 @@ const ListViewDataGrid = ({
     return <Box className={classes.root}>
         <Box className={classes.header}>
             {isEdit && <React.Fragment>
-                <Button variant="contained" title={"Edit"} className={classes.button} onClick={handleRecordEvent("EDIT")} ><EditIcon style={{fontSize: 19}}/></Button>
-                <Typography style={{width: 10}}/>
+                <Button variant="contained" title={"Edit"} className={classes.button} onClick={handleRecordEvent("EDIT")} ><EditIcon style={{ fontSize: 19 }} /></Button>
+                <Typography style={{ width: 10 }} />
             </React.Fragment>}
             {isDelete && <React.Fragment>
-                <Button variant="contained" title={"Delete"} className={classes.button} onClick={handleRecordEvent("DELETE")} ><DeleteIcon style={{fontSize: 19}}/></Button>
-                <Typography style={{width: 10}}/>
+                <Button variant="contained" title={"Delete"} className={classes.button} onClick={handleRecordEvent("DELETE")} ><DeleteIcon style={{ fontSize: 19 }} /></Button>
+                <Typography style={{ width: 10 }} />
             </React.Fragment>}
+            {(moreMenues && moreMenues.length > 0) && <IconButton aria-label="display more actions" color="inherit" className={classes.moreButton} title={"More Actions"} onClick={(event)=> openCustomMenu(moreMenues, event.currentTarget, handleMoreButton)}>
+                <MoreIcon />
+            </IconButton>}
+            <Typography style={{ width: 10 }} />
             <ListViewFilterComponent fields={filterFields} onChange={onFilterChange} />
-            <Typography style={{width: 10}}/>
-            {isExcelDownlod && <React.Fragment>                
+            <Typography style={{ width: 10 }} />
+            {isExcelDownlod && <React.Fragment>
                 <Button variant="contained" title={"Download Excel"} className={classes.button} onClick={() => callBack("DOWN_LOAD_EXCEL", rowIds)} >
-                <i className="fa fa-file-excel-o" aria-hidden="true"></i>
+                    <i className="fa fa-file-excel-o" aria-hidden="true"></i>
                 </Button>
-                <Typography style={{width: 10}}/>
+                <Typography style={{ width: 10 }} />
             </React.Fragment>}
         </Box>
         <DataGrid
             //apiRef={apiRef}
-            key={"data-grid"}
+            key={"data-grid-" + id + "-" + columns.length + rows.length}
             headerHeight={25}
             rowHeight={25}
             checkboxSelection={checkboxSelection}
@@ -175,30 +193,32 @@ const ListViewDataGrid = ({
 
 export default ListViewDataGrid;
 
-const FormattedHeaderComponent = ({colDef,...params}) => {    
+const FormattedHeaderComponent = ({ colDef, ...params }) => {
     return <div style={{
         fontWeight: "bold",
         color: '#000000b5',
-        overflow: 'hidden', 
-        textOverflow: 'ellipsis', 
-        whiteSpace: 'nowrap'}
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+    }
     } title={colDef.headerName}>{colDef.headerName}</div>
 }
 
 
-const FormattedCellComponent = ({params}) => {
+const FormattedCellComponent = ({ params }) => {
     let value = valueFormatter(params);
     return <div style={{
-        overflow: 'hidden', 
-        textOverflow: 'ellipsis', 
-        whiteSpace: 'nowrap'}
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap'
+    }
     } title={value}>{value}</div>
 }
 
-const valueFormatter = ({colDef, value, ...params}) => {
-    if(colDef.type == "DATE") {
+const valueFormatter = ({ colDef, value, ...params }) => {
+    if (colDef.type == "DATE") {
         let dt = new Date(value);
-        let strDt = moment(dt).format('YYYY-MMM-DD HH:mm:ss') ; //moment(dt).format('YYYY-MMM-DD hh:mm:ss a') ;
+        let strDt = moment(dt).format('YYYY-MMM-DD HH:mm:ss'); //moment(dt).format('YYYY-MMM-DD hh:mm:ss a') ;
         return strDt
     }
     return value;

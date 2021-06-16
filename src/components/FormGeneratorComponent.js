@@ -136,7 +136,7 @@ const Field = ({ index, field, callBack = () => { } }) => {
                         >
 
                             {fieldProps.options && fieldProps.options.map((option, index) => (
-                                <option key={option.value + "-" + index} value={option.value}>
+                                <option key={String(option.value) + "-" + index} value={option.value}>
                                     {option.label}
                                 </option>
                             ))}
@@ -155,7 +155,7 @@ const Field = ({ index, field, callBack = () => { } }) => {
 const inputLabelProps = {
     style: {
         fontSize: 13,
-        color: "#000000bd"
+        color: "#000000bd",
     },
 }
 

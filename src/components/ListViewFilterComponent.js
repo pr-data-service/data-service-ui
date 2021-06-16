@@ -48,17 +48,17 @@ const underLineStyle = makeStyles((theme) => ({
 const ListViewFilterComponent = ({ fields=[], onChange=()=>{} }) => {
     const classes = useStyles();
     
-    let arrFields = fields.map((m, index) => <FilterTextField key={'FilterTextField-'+index} {...m} onChange={onChange}/>);
+    let arrFields = fields.map((m, index) => <FilterTextField key={'FilterTextField-'+index} id={'FilterTextField-'+index} {...m} onChange={onChange}/>);
     let elements = [];
     arrFields.map((m, index)=>{
         if((index+1 != 1) && (index+1 % 2 != 0)) {
-            elements.push(<Box key={'box-'+index}style={{ width: 10 }}></Box>)
+            elements.push(<Box key={'box-'+index} style={{ width: 10 }}></Box>);
         }
         elements.push(m);
     });
-    return <Box style={{ display: "flex" }}>
+    return <Box key={'box-root'} style={{ display: "flex" }}>
         {elements}
-        <Box style={{ width: 10 }}></Box>
+        <Box key={'box-gap'} style={{ width: 10 }}></Box>
         <Button variant="contained" title={"Search"} className={classes.button} onClick={onChange("SEARCH_BUTTON")} >Search</Button>
     </Box>
 }
@@ -74,7 +74,7 @@ const useInputStyle = makeStyles((theme) => ({
     },
     select: {
         height: 31,
-        width: 170,
+        width: 140,
         color: "#000000d9"
     },
     searchInput: {
@@ -82,7 +82,7 @@ const useInputStyle = makeStyles((theme) => ({
         border: "none",
         outlineWidth: 0,
         color: "#000000d9",
-        width: 170,
+        width: 140,
     },
     search: {
         display: "flex",
@@ -98,22 +98,22 @@ const useInputStyle = makeStyles((theme) => ({
 
 
 const FilterTextField = (props) => {
-    const {type, name, label, options, onChange = () => { }} = props;
+    const {id, type, name, label, options, onChange = () => { }} = props;
     const classes = useInputStyle();
-    let element = <input type="text" placeholder="Search Data" className={classes.text} />;
+    let element = <input key={id} type="text" placeholder="Search Data" className={classes.text} />;
     if (type == "SELECT") {
-        element = <select placeholder="Search Data" className={classes.select}
+        element = <select key={id} placeholder="Search Data" className={classes.select}
             id={"name-" + name}
             name={name}
             onChange={onChange(name)}
         >
-            <option value=''> -- Select {label} -- </option>
-            {options && options.map(m => <option value={m.value}>{m.label}</option>)}
+            <option key={'option-select-'+id} value=''> -- Select {label} -- </option>
+            {options && options.map((m,index) => <option  key={id+'-option-'+index}value={m.value}>{m.label}</option>)}
         </select>;
     } else if (type == "SEARCH") {
-        element = <FilterSearchField {...props}/>
+        element = <FilterSearchField key={id} {...props}/>
     } else if (type == "DATE") {
-        element = <FilterDateField {...props}/>
+        element = <FilterDateField key={id} {...props}/>
     }
     return element;
 }
@@ -144,7 +144,7 @@ const FilterDateField = (props) => {
         defaultValue={moment(defaultValue).format('YYYY-MM-DDTHH:mm')}
         className={classes.dateField}
         size="small"
-        style={{ width: 190, borderBottom: "px solid red" }}
+        style={{ width: 190, borderBottom: "1px solid none" }}
         InputProps={{ classes: classesUnderLine }}
         InputLabelProps={{
             shrink: false,

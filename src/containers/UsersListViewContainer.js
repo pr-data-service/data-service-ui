@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 const UsersListViewContainer = () => {
-    const { showSnackbar, openConfirmDialog } = React.useContext(AppRootContext);
+    const { showSnackbar, openConfirmDialog, openDialog } = React.useContext(AppRootContext);
     const { loggedInUser } = React.useContext(AppContext);
     const classes = useStyles();
     const history = useHistory();
@@ -42,9 +42,34 @@ const UsersListViewContainer = () => {
     const [filterParams, setFilterParams] = React.useState({});
     const [filterFields, setFilterFields] = React.useState([...arrFields]);
 
+    const isSuperAdmin = loggedInUser && loggedInUser.superAdmin ? true : false;
+
     React.useEffect(()=> {
+        getAllAdminUser();
         getData();
     }, []);
+
+    const getAllAdminUser = async () => {
+        if(loggedInUser && (loggedInUser.superAdmin)) {
+            let responseData = await userService.getAllAdminUser();
+            if(responseData && responseData.status == 0 && responseData.data){
+                let users = responseData.data;
+                users = users.map(m => { return {value: m.id, label: m.firstName + " " + m.lastName}});
+                if(filterFields) {
+                    let arr = [...filterFields];
+                    arr.map( m => {
+                        if(m.name == "userId") {
+                            m.options = users;
+                        }
+                    })
+                    setFilterFields(arr);
+                }
+            }
+        } else {
+            let arr = filterFields.filter( f => f.name != "userId");
+            setFilterFields(arr);
+        }        
+    }
 
 
     const getData = async (filterParams) => {
@@ -62,11 +87,69 @@ const UsersListViewContainer = () => {
                 if(type == "EDIT") {
                     history.push("/user/edit/"+values[0]);
                 } else if(type == "DELETE") {
-                    deleteRawData(values[0]);
+                    deleteRawData(values[0]);                    
                 }                
             }
+        } else if(type == "FROM_MORE_BUTTON") {
+            if(values.value == "ADD_USER_TO_ADMIN_MENU") {
+                if(values.selectedRecordIds.length > 0){
+                    openDialog(<AddUserToAdmin userList={rows} selectedUsers={values.selectedRecordIds} callBack={handleRecordEvent}/>, "Add User to Admin");
+                } else {
+                    showSnackbar("Select one or more record!");
+                }                
+            } else if(values.value == "REMOVE_USER_FROM_ADMIN_MENU") {
+                if(values.selectedRecordIds.length > 0){
+                    removeFromParent(values.selectedRecordIds);
+                } else {
+                    showSnackbar("Select one or more record!");
+                }                
+            } else if(values.value == "ACTIVE_MENU" || values.value == "DEACTIVE_MENU") {
+                if(values.selectedRecordIds.length > 0){
+                    activeOrDeactive({ids: values.selectedRecordIds, fieldNameValue: {isActive: values.value == "ACTIVE_MENU" ? true : false}});
+                } else {
+                    showSnackbar("Select one or more record!");
+                } 
+            }
+        } else if(type == "ADD_USER_TO_ADMIN") {
+            addToParent(values)
         }
         
+    }
+
+    const addToParent = async ({parentId, selectedUsers}) => {        
+        openConfirmDialog("Do you want to add selected users to Admin?", null, async () => {
+            let responseData = await userService.addToParent({parentId, userIds: selectedUsers});
+            if(responseData && responseData.status == 0){
+                showSnackbar("Successfully Added.");
+                getData(filterParams);
+            } else {
+                showSnackbar("Failed to added.");
+            }
+        })
+    }
+
+    const activeOrDeactive = async (params) => {
+        openConfirmDialog("Do you want to "+(params.fieldNameValue.isActive ? "ACTIVE" : "DEACTIVE") +" selected users from Admin?", null, async () => {
+            let responseData = await userService.activeOrDeactive(params);
+            if(responseData && responseData.status == 0) {
+                showSnackbar("Successfully "+(params.fieldNameValue.isActive ? "Active" : "Deactive") +"ted.");
+                getData(filterParams);
+            } else {
+                showSnackbar("Failed to "+(params.fieldNameValue.isActive ? "Active" : "Deactive"));
+            }
+        })
+    }
+
+    const removeFromParent = async (selectedUsers) => {        
+        openConfirmDialog("Do you want to remove selected users from Admin?", null, async () => {
+            let responseData = await userService.removeFromParent({userIds: selectedUsers});
+            if(responseData && responseData.status == 0) {
+                showSnackbar("Successfully removed.");
+                getData(filterParams);
+            } else {
+                showSnackbar("Failed to removed.");
+            }
+        })
     }
 
     const deleteRawData = (id) => {
@@ -98,25 +181,68 @@ const UsersListViewContainer = () => {
         }
     }
 
+    let cols = isSuperAdmin ? columns : columns.filter( f => f.field != "type" && f.field != "activeOrdeactive" && f.field != "parent" && f.field != "createdOn" && f.field != "updatedOn");
+
     return <>
-        <ListViewDataGrid columns={columns} rows={rows} callBack={handleRecordEvent} filterFields={filterFields} onFilterChange={onFilterChange}/>
+        <ListViewDataGrid 
+            id={"user-listview"} 
+            columns={cols} 
+            rows={rows} 
+            callBack={handleRecordEvent} 
+            filterFields={filterFields} 
+            onFilterChange={onFilterChange} 
+            isEdit={isSuperAdmin ? true : false}
+            isDelete={isSuperAdmin ? true : false}
+            moreMenues={isSuperAdmin ? moreMenues : []}/>
     </>;
 }
 
 export default UsersListViewContainer;
 
 const columns = [
+    { field: 'userName', headerName: 'USER NAME', type: "STRING", width: 200, },
     { field: 'firstName', headerName: 'FIRST NAME', type: "STRING", width: 200, },
     { field: 'lastName', headerName: 'LAST NAME', type: "STRING", width: 200, },
     { field: 'email', headerName: 'EMAIL', type: "STRING", width: 200, },
-    { field: 'phone', headerName: 'PHONE', type: "STRING", width: 200, },
-    { field: 'type', headerName: 'TYPE', type: "STRING", width: 200, },
-    { field: 'activeOrdeactive', headerName: 'ATIVE/DE-ACTIVE', type: "STRING", width: 200, },
+    { field: 'phone', headerName: 'PHONE', type: "STRING", width: 110, },
+    { field: 'parent', headerName: 'Admin', type: "STRING", width: 200, },
+    { field: 'type', headerName: 'TYPE', type: "STRING", width: 110, },
+    { field: 'activeOrdeactive', headerName: 'ACTIVE/DE-ACTIVE', type: "STRING", width: 200, },
     { field: 'createdOn', headerName: 'Created On', type: "DATE", width: 200, },
     { field: 'updatedOn', headerName: 'Updated On', type: "DATE", width: 200, },
 ];
 
 
 const arrFields =[
+    {name: "userId", label: "User", type: "SELECT"},
     {name: "search", label: "Search", type: "SEARCH"},
 ]
+
+const moreMenues =[
+    {value: "ADD_USER_TO_ADMIN_MENU", label: "Add user to Admin"},
+    {value: "REMOVE_USER_FROM_ADMIN_MENU", label: "Remove user from Admin"},
+    {value: "ACTIVE_MENU", label: "Active"},
+    {value: "DEACTIVE_MENU", label: "Deactive"},
+]
+
+
+const AddUserToAdmin = ({userList=[], callBack=()=>{}, selectedUsers=[]}) => {
+
+    const [adminId, setAdminId] = React.useState(0);
+
+    const handleAddUserToAdmin = () => {
+        if(adminId && adminId > 0) {
+            callBack("ADD_USER_TO_ADMIN", {parentId: adminId, selectedUsers});
+        }
+    }
+
+    const options = userList.filter(f => f.type == "ADMIN").map( m => <option value={m.id}>{`${m.firstName} ${m.lastName} (${m.email})`}</option>) 
+
+    return <Box style={{width: 500, padding: "0px 20px 20px", display: "flex"}}>
+        <select style={{width: "80%", height: 30,  color: "#000000d9"}} onChange={(e)=> setAdminId(e.target.value)}>
+            <option value={0}>--- Select Admin ---</option>
+        {options}
+        </select>
+        <Button variant="contained" title={"Search"} style={{ marginLeft: 10, width: "20%", height: 29, }} onClick={handleAddUserToAdmin}>Add</Button>
+    </Box>
+}

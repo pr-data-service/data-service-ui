@@ -19,7 +19,7 @@ import moment from 'moment';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-
+        
     },
     boxHeader: {
         padding: "20px 0px 15px 30px"
@@ -40,6 +40,7 @@ const RawDataDraftingListviewContainer = () => {
     const { showSnackbar, openConfirmDialog } = React.useContext(AppRootContext);
     const { loggedInUser } = React.useContext(AppContext);
     const isAdmin = loggedInUser && loggedInUser.admin ? true : false;
+    const isSuperAdmin = loggedInUser && loggedInUser.superAdmin ? true : false;
 
     const classes = useStyles();
     const history = useHistory();
@@ -83,24 +84,26 @@ const RawDataDraftingListviewContainer = () => {
     }
 
     const handleRecordEvent = (type, values) => {
-        if(type == "EDIT" || type == "DELETE") {
+        if(type == "EDIT") {
             if(values.length == 0 || values.length > 1) {
                 showSnackbar("Select one record for this operation.");
             } else if(values.length > 0) {
-                if(type == "EDIT") {
-                    history.push("/data-drafting-form/"+values[0]);
-                } else if(type == "DELETE") {
-                    deleteRawData(values[0]);
-                }                
+                history.push("/data-drafting-form/"+values[0]);               
+            }
+        } else if(type == "DELETE") {
+            if(values.length == 0 || values.length > 50) {
+                showSnackbar("Select one or less then equal 51 record for this operation.");
+            } else {
+                deleteRawData({ids: values});
             }
         }
         
     }
 
-    const deleteRawData = (id) => {
+    const deleteRawData = (params) => {
 
-        openConfirmDialog("Do you want to delete this record?", null, async () => {
-            let responseData = await dtataDraftingFormService.deleteRawDataById(id);
+        openConfirmDialog("Do you want to delete those record?", null, async () => {
+            let responseData = await dtataDraftingFormService.deleteRawData(params);
             if(responseData){
                 if(responseData.status == 0) {
                     showSnackbar("Successfully deleted.");
@@ -135,14 +138,14 @@ const RawDataDraftingListviewContainer = () => {
     }
 
     return <>
-        <ListViewDataGrid columns={columns} rows={rows} callBack={handleRecordEvent} filterFields={filterFields} onFilterChange={onFilterChange}/>
+        <ListViewDataGrid id={"raw-data-listview"} columns={columns} rows={rows} callBack={handleRecordEvent} filterFields={filterFields} onFilterChange={onFilterChange} isDelete={isSuperAdmin ? true : false}/>
     </>;
 }
 
 export default RawDataDraftingListviewContainer;
 
 const columns = [
-    { field: 'workLoad', headerName: 'WORK LOAD', type: "STRING", width: 150, },
+    { field: 'workLoad', headerName: 'WORK LOAD', type: "INTEGER", width: 150, },
     { field: 'cRefNo', headerName: 'CUSTOMER REFRENCE NUMBER', type: "STRING", width: 200, },
     { field: 'cName', headerName: 'CUSTOMER NAME', type: "STRING", width: 200, },
     { field: 'city', headerName: 'CITY', type: "STRING", width: 200, },

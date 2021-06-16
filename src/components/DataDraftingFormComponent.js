@@ -17,9 +17,9 @@ const useStyles = makeStyles((theme) => ({
     },
     formContainer: {
         width: "50%",
-        height: 600,
-        maxHeight: 600,
-        overflow: "auto",
+        // height: 600,
+        // maxHeight: 600,
+        // overflow: "auto",
         padding: "0px 12px"
     }
 }));
@@ -109,9 +109,28 @@ const DataDraftingFormComponent = () => {
         }
     }
 
+    const isDuplicateRawData = async () => {
+        let { cRefNo, guarantorNo } = childRef.current.getFormValues();
+        let params = {cRefNo, guarantorNo};
+        if(id && id > 0) {
+            params.id = id;
+        }
+        let responseData = await dtataDraftingFormService.isDuplicateRawData(params);
+        if (responseData && responseData.status == 0) {
+            return responseData.data;
+        } 
+        return false;
+    }
+
 
 
     const onSubmit = async (data, e) => {
+        let isDuplicate = await isDuplicateRawData();
+        if(isDuplicate) {
+            showSnackbar("System can not allow duplicate CUSTOMER REFRENCE NUMBER or GUARANTOR NUMBER.");
+            return;
+        }
+
         if (id > 0) {
             data.id = id;
         }
@@ -151,7 +170,10 @@ const onBlurEvent = (getValues, setValue, fieldName, event) => {
     } else if (fieldName == "cName" || fieldName == "guarantorName") {
         let rawVal = UtilsFunc.upperCase(event.target.value);
         rawVal = rawVal.replace(/[0-9]/g, '');
-        if(rawVal.startsWith("MRS. ")) {
+        if(rawVal.startsWith("MR. ")) {
+            rawVal = rawVal.replaceAll("MR.", "");
+            rawVal = "MR."+rawVal.trim();
+        } else if(rawVal.startsWith("MRS. ")) {
             rawVal = rawVal.replaceAll("MRS.", "");
             rawVal = "MRS."+rawVal.trim();
         } else if(rawVal.toUpperCase().startsWith("MS. ")) {
@@ -209,20 +231,16 @@ let fieldConstants = [
     { name: "city", label: "CITY", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent }, rules: {} },
     { name: "state", label: "STATE", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent }, rules: {} },
     { name: "purchaseVal", label: "PURCHASE VALUE", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
-    { name: "purchaseValInWords", label: "PURCHASE VALUE IN WORDS", type: "TEXT", gridXS: 12, required: false, value: "", readonly: true, multiline: true, event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {}, InputProps:{color: "red"} },
+    { name: "purchaseValInWords", label: "PURCHASE VALUE IN WORDS", type: "TEXT", gridXS: 12, required: false, value: "", readonly: true, multiline: true, event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {}, InputProps:{color: "red", background: "#00000021"} },
     { name: "downPayment", label: "DOWN PAYMENT(%)", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
     { name: "loanPeriod", label: "LOAN PERIOD(YEARS)", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
     { name: "annualInterest", label: "ANNUAL INTEREST(%)", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
-    { name: "guarantorName", label: "GUARANTER NAME", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent }, rules: {} },
-    { name: "guarantorNo", label: "GUARANTOR NUMBER", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent }, rules: {} },
     { name: "purchaseValReduc", label: "PURCHASE VALUE REDUCTION(%)", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
-    //{ gridXS: 6 },
     { name: "monthPrincReduc", label: "MONTHLY PRINCIPLE REDUCTION(%)", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
     { name: "totIntReduc", label: "TOTAL INTEREST REDUCTION(%)", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
-    //{ gridXS: 6 },
-    //{ name: "propTaxState", label: "PROPERTY TAX STATE", type: "SELECT", gridXS: 6, options: [{ value: ' ', label: '--- Select State ---' }], value: " ", event: { onBlur: onBlurEvent }, rules: {} },
-    //{ name: "propTaxCity", label: "PROPERTY TAX CITY", type: "SELECT", gridXS: 6, options: [{ value: ' ', label: '--- Select City ---' }], value: " ", event: { onBlur: onBlurEvent }, rules: {} },
-    { name: "propTaxReducPrcntg", label: "PROPERTY TAX REDUCTION (%)", type: "TEXT", gridXS: 6, value: "", event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {} },
+    { name: "guarantorName", label: "GUARANTER NAME", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent }, rules: {} },
+    { name: "guarantorNo", label: "GUARANTOR NUMBER", type: "TEXT", gridXS: 6, required: true, value: "", event: { onBlur: onBlurEvent }, rules: {} },
+    { name: "propTaxReducPrcntg", label: "PROPERTY TAX REDUCTION (%)", type: "TEXT", gridXS: 6, value: "", readonly: true, event: { onBlur: onBlurEvent, onKeyUp: onKeyUpEvent }, rules: {}, InputProps:{color: "red", background: "#00000021"}},
 ]
 
 

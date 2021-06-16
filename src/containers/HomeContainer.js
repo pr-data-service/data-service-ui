@@ -27,11 +27,10 @@ const useStyles = makeStyles((theme) => ({
         padding: "20px 0px 15px 30px"
     },
     body: {
-        margin: "15px 40px",
-    },
-    menuContainer: {
-        height: 650
-    },
+        padding: "15px 15px",
+        display: "flex",
+        minHeight: 530
+    },    
     boxFooter: {
         display: "none"
     },
@@ -39,11 +38,17 @@ const useStyles = makeStyles((theme) => ({
         height: 200
     },
     mainContainer: {
-        height: 610,
+        height: "inherit",
         marginLeft: 20,
         padding: 30,
-        overflow: "auto"
+        float: "right",
+        width: "82%"
     },
+    menuContainer: {
+        float: "left",
+        width: "11%",
+        height: "inherit"
+    }
 }));
 
 
@@ -53,17 +58,13 @@ const HomeContainer = () => {
     return <Box className={classes.root}>
         <HomeHeaderContainer />
         <Box className={classes.body}>
-            <Grid container>
-                <Grid item xs={2}>
-                    <MenuComponent />
-                </Grid>
-                <Grid item xs={10}>
-                    <Paper elevation={8} className={classes.mainContainer}>
-                        <HomeRouterComponent />
-                    </Paper>
-                </Grid>
-            </Grid>
-        </Box>        
+            <Box className={classes.menuContainer}>
+                <MenuComponent />
+            </Box>
+            <Paper elevation={8} className={classes.mainContainer}>
+                <HomeRouterComponent />
+            </Paper>
+        </Box>
     </Box>;
 }
 

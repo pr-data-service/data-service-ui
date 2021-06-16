@@ -18,6 +18,9 @@ const useStyles = makeStyles((theme) => ({
         color: "#fff",
         backgroundColor: "#1976d2"
     },
+    toolBar: {
+        minHeight: 46
+    },
     grow:{
         flexGrow: 1,
     },
@@ -129,12 +132,21 @@ const HomeHeaderContainer = () => {
         }
     }
 
+    const handleChangePassword = () => {
+        try {
+            handleMenuClose();
+            history.push("/change-password");          
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     const isAdmin = loggedInUser && loggedInUser.admin ? true : false;
     const isSuperAdmin = loggedInUser && loggedInUser.superAdmin ? true : false;
     const logedInUserName = loggedInUser ? loggedInUser.firstName + " " + loggedInUser.lastName : "";    
 
     return <AppBar position="static" className={classes.root}>
-        <Toolbar>
+        <Toolbar className={classes.toolBar}>
             <Typography className={classes.title} variant="h6">
                 Data Drafting Service
             </Typography>
@@ -188,6 +200,7 @@ const HomeHeaderContainer = () => {
             onClose={handleMenuClose}            
         >
             <MenuItem onClick={() => {handleMenuClose(); handleEditProfile()} }>Profile</MenuItem>
+            <MenuItem onClick={handleMenuClose} onClick={handleChangePassword}>Change Password</MenuItem>
             {isSuperAdmin && <MenuItem onClick={handleMenuClose} onClick={handleLoginTime}>Login Time</MenuItem>}
             <MenuItem onClick={handleMenuClose} onClick={handleLogout}>Logout</MenuItem>
         </Menu>

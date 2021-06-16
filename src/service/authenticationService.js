@@ -27,9 +27,18 @@ const getAppLoginInfo = () => {
     }    
 }
 
+const savePassword = (params) => {
+    try{
+        return HttpClient.post(apiUrl.PASSWORD_CHANGE, params);        
+    }catch(error){
+        console.error(error);
+    }    
+}
+
 
 export default {
     getToken,
     saveAppLoginInfo,
-    getAppLoginInfo
+    getAppLoginInfo,
+    savePassword
 }

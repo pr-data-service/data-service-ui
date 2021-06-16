@@ -146,14 +146,14 @@ const DataDraftingResultListViewContainer = () => {
     }
 
     return <>
-        <ListViewDataGrid columns={columns} rows={rows} callBack={handleRecordEvent} filterFields={filterFields} onFilterChange={onFilterChange} checkboxSelection={false} isEdit={false} isDelete={false} isExcelDownlod={isExcelDownlod} />
+        <ListViewDataGrid id={"result-listview"} columns={columns} rows={rows} callBack={handleRecordEvent} filterFields={filterFields} onFilterChange={onFilterChange} checkboxSelection={false} isEdit={false} isDelete={false} isExcelDownlod={isExcelDownlod} />
     </>;
 }
 
 export default DataDraftingResultListViewContainer;
 
 const columns = [
-    { field: 'workLoad', headerName: 'WORK LOAD', type: "STRING", width: 150, },
+    { field: 'workLoad', headerName: 'WORK LOAD', type: "INTEGER", width: 150, },
     { field: 'cRefNo', headerName: 'CUSTOMER REFRENCE NUMBER', type: "STRING", width: 200, },
     { field: 'cName', headerName: 'CUSTOMER NAME', type: "STRING", width: 200, },
     { field: 'cityState', headerName: 'CITY ,STATE', type: "STRING", width: 200, },

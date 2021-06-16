@@ -342,6 +342,14 @@ const deleteRawDataById = (id) => {
     }  
 }
 
+const deleteRawData = (params) => {
+    try{
+        return HttpClient.post(apiUrl.DATA_DRAFTING_SERVICE_DELETE_BATCH, params);        
+    }catch(error){
+        console.error(error);
+    }  
+}
+
 const getListViewResultData = (filterParams) => {
     try{
         return HttpClient.get(apiUrl.DATA_DRAFTING_SERVICE_RESULT_LIST_VIEW_GET, filterParams);        
@@ -357,6 +365,14 @@ const downloadExcel = (filterParams, headers) => {
     }  
 }
 
+const isDuplicateRawData = (params) => {
+    try{
+        return HttpClient.post(apiUrl.DATA_DRAFTING_SERVICE_IS_DUPLICATE, params);        
+    }catch(error){
+        console.error(error);
+    }  
+}
+
 export default {
     getState,
     getPropertyTax,
@@ -365,6 +381,8 @@ export default {
     getListViewRawData,
     getRawDataById,
     deleteRawDataById,
+    deleteRawData,
     getListViewResultData,
-    downloadExcel
+    downloadExcel,
+    isDuplicateRawData
 }

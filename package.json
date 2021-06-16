@@ -1,6 +1,6 @@
 {
-  "name": "snapshot-ui",
-  "homepage": "https://pr-data-service.github.io/data-service-ui",
+  "name": "snapshot-ui",    
+  "homepage": "http://13-232-187-25:8080",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
